@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="Linux-clang++"
+	BuildStamp="20210522-2133-Experimental"
+	Name="samubv"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/clang++"
+	CompilerVersion="10.0.0"
+	OSName="Linux"
+	Hostname="samubv"
+	OSRelease="5.8.0-53-generic"
+	OSVersion="#60~20.04.1-Ubuntu SMP Thu May 6 09:52:46 UTC 2021"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="GenuineIntel"
+	VendorID="Intel Corporation"
+	FamilyID="6"
+	ModelID="158"
+	ProcessorCacheSize="12288"
+	NumberOfLogicalCPU="5"
+	NumberOfPhysicalCPU="5"
+	TotalVirtualMemory="2047"
+	TotalPhysicalMemory="11882"
+	LogicalProcessorsPerPhysical="1"
+	ProcessorClockFrequency="3696"
+	>
+	<Configure>
+		<StartDateTime>May 22 17:33 EDT</StartDateTime>
+		<StartConfigureTime>1621719228</StartConfigureTime>
+		<ConfigureCommand>"/usr/bin/cmake" "/home/sam/development/boidsECS/test"</ConfigureCommand>
+		<Log>-- Conan: Adjusting output directories
+-- Conan: Using cmake global configuration
+-- Conan: Adjusting default RPATHs Conan policies
+-- Conan: Adjusting language standard
+-- Current conanbuildinfo.cmake directory: /home/sam/development/boidsECS/test/build/Release
+-- Conan: Compiler Clang&gt;=8, checking major version 10
+-- Conan: Checking correct version: 10
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/sam/development/boidsECS/test/build/Release
+</Log>
+		<ConfigureStatus>0</ConfigureStatus>
+		<EndDateTime>May 22 17:33 EDT</EndDateTime>
+		<EndConfigureTime>1621719228</EndConfigureTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Configure>
+</Site>

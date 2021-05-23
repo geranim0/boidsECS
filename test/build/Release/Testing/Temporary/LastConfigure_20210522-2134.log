@@ -1,0 +1,10 @@
+-- Conan: Adjusting output directories
+-- Conan: Using cmake global configuration
+-- Conan: Adjusting default RPATHs Conan policies
+-- Conan: Adjusting language standard
+-- Current conanbuildinfo.cmake directory: /home/sam/development/boidsECS/test/build/Release
+-- Conan: Compiler Clang>=8, checking major version 10
+-- Conan: Checking correct version: 10
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/sam/development/boidsECS/test/build/Release

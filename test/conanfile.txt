@@ -1,0 +1,11 @@
+[requires]
+gtest/1.10.0
+
+
+[options]
+gtest:build_gmock=False
+gtest:shared=True
+
+
+[generators]
+cmake

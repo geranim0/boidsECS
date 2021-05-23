@@ -1,0 +1,40 @@
+[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=clang
+    compiler.libcxx=libstdc++11
+    compiler.version=10
+    os=Linux
+
+[requires]
+    gtest/1.Y.Z
+
+[options]
+
+
+[full_settings]
+    arch=x86_64
+    arch_build=x86_64
+    build_type=Release
+    compiler=clang
+    compiler.libcxx=libstdc++11
+    compiler.version=10
+    os=Linux
+    os_build=Linux
+
+[full_requires]
+    gtest/1.10.0:c9ffaa3b053b7fe4fad3fd29d3cc81b426a80758
+
+[full_options]
+    gtest:build_gmock=False
+    gtest:fPIC=True
+    gtest:hide_symbols=False
+    gtest:no_main=False
+    gtest:shared=True
+
+[recipe_hash]
+
+
+[env]
+    CC=/usr/bin/clang
+    CXX=/usr/bin/clang++

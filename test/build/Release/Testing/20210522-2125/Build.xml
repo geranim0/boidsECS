@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="Linux-clang++"
+	BuildStamp="20210522-2125-Experimental"
+	Name="samubv"
+	Generator="ctest-3.16.3"
+	CompilerName="/usr/bin/clang++"
+	CompilerVersion="10.0.0"
+	OSName="Linux"
+	Hostname="samubv"
+	OSRelease="5.8.0-53-generic"
+	OSVersion="#60~20.04.1-Ubuntu SMP Thu May 6 09:52:46 UTC 2021"
+	OSPlatform="x86_64"
+	Is64Bits="1"
+	VendorString="GenuineIntel"
+	VendorID="Intel Corporation"
+	FamilyID="6"
+	ModelID="158"
+	ProcessorCacheSize="12288"
+	NumberOfLogicalCPU="5"
+	NumberOfPhysicalCPU="5"
+	TotalVirtualMemory="2047"
+	TotalPhysicalMemory="11882"
+	LogicalProcessorsPerPhysical="1"
+	ProcessorClockFrequency="3696"
+	>
+	<Build>
+		<StartDateTime>May 22 17:25 EDT</StartDateTime>
+		<StartBuildTime>1621718750</StartBuildTime>
+		<BuildCommand>/usr/bin/cmake --build . --config "Release"</BuildCommand>
+		<Error>
+			<BuildLogLine>1</BuildLogLine>
+			<Text>CMake Error at /usr/share/cmake-3.16/Modules/CTestUseLaunchers.cmake:32 (if):</Text>
+			<PreContext></PreContext>
+			<PostContext>  Maximum recursion depth of 1000 exceeded
+Call Stack (most recent call first):
+  /usr/share/cmake-3.16/Modules/CTest.cmake:61 (include)
+  CTestConfig.cmake:6 (include)
+  /usr/share/cmake-3.16/Modules/CTest.cmake:87 (include)
+  CTestConfig.cmake:6 (include)
+  /usr/share/cmake-3.16/Modules/CTest.cmake:87 (include)
+  CTestConfig.cmake:6 (include)
+  /usr/share/cmake-3.16/Modules/CTest.cmake:87 (include)
+  CTestConfig.cmake:6 (include)</PostContext>
+			<RepeatCount>0</RepeatCount>
+		</Error>
+		<Warning>
+			<BuildLogLine>1</BuildLogLine>
+			<Text>*** WARNING non-zero return value in ctest from: /usr/bin/cmake</Text>
+			<PreContext></PreContext>
+			<PostContext></PostContext>
+			<RepeatCount>0</RepeatCount>
+		</Warning>
+		<Log Encoding="base64" Compression="bin/gzip"/>
+		<EndDateTime>May 22 17:25 EDT</EndDateTime>
+		<EndBuildTime>1621718751</EndBuildTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Build>
+</Site>

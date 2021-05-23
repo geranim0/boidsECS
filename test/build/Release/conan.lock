@@ -1,0 +1,24 @@
+{
+ "graph_lock": {
+  "nodes": {
+   "0": {
+    "options": "gtest:build_gmock=False\ngtest:fPIC=True\ngtest:hide_symbols=False\ngtest:no_main=False\ngtest:shared=True",
+    "requires": [
+     "1"
+    ],
+    "path": "../../conanfile.txt",
+    "context": "host"
+   },
+   "1": {
+    "ref": "gtest/1.10.0",
+    "options": "build_gmock=False\nfPIC=True\nhide_symbols=False\nno_main=False\nshared=True",
+    "package_id": "c9ffaa3b053b7fe4fad3fd29d3cc81b426a80758",
+    "prev": "0",
+    "context": "host"
+   }
+  },
+  "revisions_enabled": false
+ },
+ "version": "0.4",
+ "profile_host": "[settings]\narch=x86_64\narch_build=x86_64\nbuild_type=Release\ncompiler=clang\ncompiler.libcxx=libstdc++11\ncompiler.version=10\nos=Linux\nos_build=Linux\n[options]\n[build_requires]\n[env]\nCC=/usr/bin/clang\nCXX=/usr/bin/clang++"
+}
