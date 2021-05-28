@@ -29,4 +29,7 @@ else:
 
 
 cmake ../.. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=@(args.build_type)
-cmake --build .
+state = !(cmake --build .)
+
+#used for next script to know if compilation was success or failure
+exit(state.returncode)

@@ -44,8 +44,10 @@ conan_basic_setup()
 
 add_executable(
     boidsECSTests
+  ../boidsECS/helpers.cpp
   ECS.test.cpp
   gmeta.test.cpp
+  bresenham.test.cpp
 )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CONAN_LIBS})

@@ -6,6 +6,15 @@
 //gereral stuff
 
 template<typename Fn, typename... Args>
+void foreach_tuple(Fn&& fn, std::tuple<Args...>& tup)
+{
+	std::apply([fn = std::forward<Fn>(fn)](auto&... elem)
+	{
+		(fn(elem), ...);
+	}, tup);
+}
+
+template<typename Fn, typename... Args>
 void foreach_tuple(Fn&& fn, std::tuple<Args...> const& tup)
 {
 	std::apply([fn = std::forward<Fn>(fn)](auto const&... elem)
@@ -16,14 +25,22 @@ void foreach_tuple(Fn&& fn, std::tuple<Args...> const& tup)
 
 //ECS boids specific
 
-struct Position
+struct position3f
 {
     float x;
     float y;
     float z;
 };
 
-struct Speed
+struct position2i
+{
+	int x, y;
+};
+
+bool operator==(position2i const& lhs, position2i const& rhs);
+bool operator<(position2i const& lhs, position2i const& rhs);
+
+struct speed3f
 {
     float x;
     float y;
@@ -33,6 +50,11 @@ struct Speed
 	{
 		std::cout << z << std::endl;
 	}
+};
+
+struct speed2i
+{
+	int x, y;
 };
 
 struct Mass
