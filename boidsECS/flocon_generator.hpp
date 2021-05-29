@@ -282,8 +282,53 @@ namespace flocon_generator
         config const& cfg;
     };
 
+
+    constexpr std::size_t getArraySize(std::size_t blocks_w, std::size_t blocks_h)
+    {
+        std::size_t div = blocks_w / 64;
+        std::size_t mod = blocks_w % 64;
+        std::size_t correction = mod != 0 ? 1 : 0;
+        return (div + correction) * blocks_h;
+    }
+    constexpr std::size_t getImageWidth(std::size_t blocks_w)
+    {
+        std::size_t div = blocks_w / 64;
+        std::size_t mod = blocks_w % 64;
+        std::size_t correction = mod != 0 ? 1 : 0;
+        return div + correction;
+    }
+
+    //bits baby
+    template<std::size_t blocks_w, std::size_t blocks_h>
     class gstructure
     {
+    public:
+        gstructure()
+        {
+            //image.create(blocks_w, blocks_h);
+        }
+
+        bool contains(position2i const& pos)
+        {
+            std::size_t image_col = static_cast<std::size_t>(pos.x) / 64;
+            std::size_t mask = 1 << (63 - (pos.x % 64));
+
+            return image[pos.y * num_sizet_w + image_col] & mask != 0;
+        }
+
+        void insert(position2i const& pos)
+        {
+            std::size_t image_col = static_cast<std::size_t>(pos.x) / 64;
+            std::size_t mask = 1 << (63 - (pos.x % 64));
+
+            image[pos.y * num_sizet_w + image_col] &= mask;
+        }
+
+        constexpr static std::size_t num_sizet_w = getImageWidth(blocks_w);
+        std::array<std::size_t, getArraySize(blocks_w ,blocks_h)> image;
+        //sf::Image image;
+
+    private:
 
     };
 
