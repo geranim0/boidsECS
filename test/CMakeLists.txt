@@ -48,6 +48,7 @@ add_executable(
   ECS.test.cpp
   gmeta.test.cpp
   bresenham.test.cpp
+  flocon_generator.test.cpp
 )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CONAN_LIBS})

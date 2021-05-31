@@ -283,49 +283,54 @@ namespace flocon_generator
     };
 
 
-    constexpr std::size_t getArraySize(std::size_t blocks_w, std::size_t blocks_h)
+    constexpr uint64_t getArraySize(uint64_t blocks_w, uint64_t blocks_h)
     {
-        std::size_t div = blocks_w / 64;
-        std::size_t mod = blocks_w % 64;
-        std::size_t correction = mod != 0 ? 1 : 0;
+        uint64_t div = blocks_w / 64;
+        uint64_t mod = blocks_w % 64;
+        uint64_t correction = mod != 0 ? 1 : 0;
         return (div + correction) * blocks_h;
     }
-    constexpr std::size_t getImageWidth(std::size_t blocks_w)
+    constexpr uint64_t getImageWidth(uint64_t blocks_w)
     {
-        std::size_t div = blocks_w / 64;
-        std::size_t mod = blocks_w % 64;
-        std::size_t correction = mod != 0 ? 1 : 0;
+        uint64_t div = blocks_w / 64;
+        uint64_t mod = blocks_w % 64;
+        uint64_t correction = mod != 0 ? 1 : 0;
         return div + correction;
     }
 
     //bits baby
-    template<std::size_t blocks_w, std::size_t blocks_h>
+    template<uint64_t blocks_w, uint64_t blocks_h>
     class gstructure
     {
     public:
         gstructure()
         {
-            //image.create(blocks_w, blocks_h);
+            for (uint64_t i = 0; i < array_size; i++)
+            {
+                image[i] = 0;
+            }
         }
 
         bool contains(position2i const& pos)
         {
-            std::size_t image_col = static_cast<std::size_t>(pos.x) / 64;
-            std::size_t mask = 1 << (63 - (pos.x % 64));
+            uint64_t image_col = static_cast<uint64_t>(pos.x) / 64;
+            uint64_t mask = ((uint64_t)1) << (63 - (pos.x % 64));
 
-            return image[pos.y * num_sizet_w + image_col] & mask != 0;
+            return (image[pos.y * num_sizet_w + image_col] & mask) != 0;
         }
 
         void insert(position2i const& pos)
         {
-            std::size_t image_col = static_cast<std::size_t>(pos.x) / 64;
-            std::size_t mask = 1 << (63 - (pos.x % 64));
+            uint64_t image_col = static_cast<uint64_t>(pos.x) / 64;
+            uint64_t mask = ((uint64_t)1) << (63 - (pos.x % 64));
 
-            image[pos.y * num_sizet_w + image_col] &= mask;
+            uint64_t index = pos.y * num_sizet_w + image_col;
+            image[index] |= mask;
         }
 
-        constexpr static std::size_t num_sizet_w = getImageWidth(blocks_w);
-        std::array<std::size_t, getArraySize(blocks_w ,blocks_h)> image;
+        constexpr static uint64_t num_sizet_w = getImageWidth(blocks_w);
+        constexpr static uint64_t array_size = getArraySize(blocks_w ,blocks_h);
+        std::array<uint64_t, array_size> image;
         //sf::Image image;
 
     private:
@@ -333,11 +338,12 @@ namespace flocon_generator
     };
 
     //TODO: change the seed mechanism. right now: hardcoded
+    template<std::size_t blocks_w, std::size_t blocks_h>
     class CollisionSystem
     {
 
     public:
-        CollisionSystem(std::set<position2i>& structure_, config const& cfg_) 
+        CollisionSystem(gstructure<blocks_w, blocks_h>& structure_, config const& cfg_) 
         : structure{structure_}, 
             cfg{cfg_}, 
             speed_rand{std::bind(std::uniform_int_distribution<int>(-cfg_.max_speed, cfg_.max_speed),
@@ -388,11 +394,11 @@ namespace flocon_generator
             {
                 position2i bresen_pos = bresen_result[i];
 
-                if (structure.contains(bresen_pos) && 
-                        bresen_pos.x < cfg.blocks_w - cfg.border_size &&
+                if (bresen_pos.x < cfg.blocks_w - cfg.border_size &&
                         bresen_pos.x > cfg.border_size &&
                         bresen_pos.y > cfg.border_size &&
-                        bresen_pos.y < cfg.blocks_h - cfg.border_size)
+                        bresen_pos.y < cfg.blocks_h - cfg.border_size &&
+                        structure.contains(bresen_pos))
                     {
                         for (int j = 1; (int)i - j >= 0 && j < 2; j++)
                         {
@@ -410,7 +416,8 @@ namespace flocon_generator
         std::_Bind<std::uniform_int_distribution<int> (std::mt19937_64)>  side_rand;
         
         //captured externals
-        std::set<position2i>& structure;
+        //std::set<position2i>& structure;
+        gstructure<blocks_w, blocks_h>& structure;
         config const& cfg;
     };
 
@@ -441,10 +448,12 @@ namespace flocon_generator
         //captured externals
         config const& cfg;
         std::set<position2i>& structure;
+        //gstructure& strructure;
         sf::RenderWindow& window;
     };
 
-    void flocon_generator_ECS(sf::RenderWindow& window, int blocks_w, int blocks_h, int block_size)
+    template<std::size_t blocks_w, std::size_t blocks_h>
+    void flocon_generator_ECS(sf::RenderWindow& window, int block_size)
     {
         using std::set;
         using std::size_t;
@@ -452,7 +461,9 @@ namespace flocon_generator
         using std::mt19937_64;
 
 
-        set<position2i> structure;
+        //set<position2i> structure;
+        gstructure<blocks_w, blocks_h> structure;
+
         config const cfg{blocks_w, blocks_h, block_size, 100, 10};
         const int num_particles = 100000;
         const int initial_structure_size = 10;
@@ -469,10 +480,10 @@ namespace flocon_generator
         ECS<types_t<
             Archetype<1024, position2i, speed2i>>,
         types_t<
-            CollisionSystem,
+            CollisionSystem<blocks_w, blocks_h>,
             PositionUpdateSystem
         >> ecs{
-            CollisionSystem{structure, cfg}, 
+            CollisionSystem<blocks_w, blocks_h>{structure, cfg}, 
             PositionUpdateSystem{cfg}};
 
             //init
@@ -488,9 +499,27 @@ namespace flocon_generator
             }
             for (int i = 0; i < initial_structure_size; i++)
             {
-                structure.insert({blocks_w/2, blocks_h/2 + i});
+                structure.insert({(int)blocks_w/2, (int)blocks_h/2 + i});
             }
 
+
+
+            //shader shit
+            if (!sf::Shader::isAvailable())
+            {
+                std::cout << "SHADERS UNAVAILABLE!$# ERROR" << std::endl;
+                abort();
+            }
+            sf::Shader fragment_shader;
+
+            if (!fragment_shader.loadFromFile("frag.glsl", sf::Shader::Fragment))
+            {
+                std::cout << "Could not load fragment shader" << std::endl;
+                abort();  
+            }
+            fragment_shader.setUniform("w", (int)blocks_w);
+            fragment_shader.setUniform("h", (int)blocks_h);
+            fragment_shader.setUniform("num_ints_w", (int)(2*structure.num_sizet_w));
 
             using Clock = std::chrono::high_resolution_clock;
             auto time_start = Clock::now();
@@ -508,11 +537,32 @@ namespace flocon_generator
                 ecs.tick();
 
                 window.clear();
-                for(auto const& pos : structure)
+                //old structure
+                /*for(auto const& pos : structure)
                 {
                     block.setPosition({(float) pos.x*cfg.block_size, (float) (cfg.blocks_h - pos.y)*cfg.block_size});
                     window.draw(block);
-                }
+                }*/
+
+                /*for (uint64_t j = 0; j < blocks_h; j++)
+                {
+                    for (uint64_t i = 0; i < structure.num_sizet_w; i++)
+                    {
+                        for (uint64_t k = 0; k < 64; k++)
+                        {
+                            if ((structure.image[structure.num_sizet_w *j + i] & ((uint64_t)1 << (63 - k))) != 0)
+                            {
+                                block.setPosition({(float) (64*i + k)*cfg.block_size, (float) (cfg.blocks_h - j)*cfg.block_size});
+                                window.draw(block);
+                            }
+                        }
+                    }
+                }*/
+
+                fragment_shader.setUniformArray("pixel_data", (float*)(&structure.image) , 2*structure.array_size);
+
+                //block.setSize({1000, 1000});
+                //window.draw(block, &fragment_shader);
                 window.display();
                 
                 //FPS shit

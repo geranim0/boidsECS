@@ -6,10 +6,17 @@
     "configurations": [
         {
             "type": "cppdbg",
-            "name": "Debug binary",
+            "name": "Debug boidsECS",
             "program": "${workspaceFolder}/boidsECS/build/Debug/bin/boidsECS",
             "request": "launch",
             "cwd": "${workspaceFolder}/boidsECS/build/Debug/bin/"
+        },
+        {
+            "type": "cppdbg",
+            "name": "Debug tests",
+            "program": "${workspaceFolder}/test/build/Debug/bin/boidsECSTests",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/test/build/Debug/bin/"
         }
     ]
 }

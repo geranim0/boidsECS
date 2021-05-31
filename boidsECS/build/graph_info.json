@@ -13,6 +13,18 @@
    "False"
   ],
   [
+   "expat:char_type",
+   "char"
+  ],
+  [
+   "expat:fPIC",
+   "True"
+  ],
+  [
+   "expat:shared",
+   "False"
+  ],
+  [
    "freetype:fPIC",
    "True"
   ],
@@ -33,6 +45,34 @@
    "True"
   ],
   [
+   "glfw:fPIC",
+   "False"
+  ],
+  [
+   "glfw:shared",
+   "False"
+  ],
+  [
+   "glfw:vulkan_static",
+   "True"
+  ],
+  [
+   "libffi:fPIC",
+   "True"
+  ],
+  [
+   "libffi:shared",
+   "False"
+  ],
+  [
+   "libiconv:fPIC",
+   "True"
+  ],
+  [
+   "libiconv:shared",
+   "False"
+  ],
+  [
    "libpng:api_prefix",
    "None"
   ],
@@ -43,6 +83,138 @@
   [
    "libpng:shared",
    "False"
+  ],
+  [
+   "libxml2:c14n",
+   "True"
+  ],
+  [
+   "libxml2:catalog",
+   "True"
+  ],
+  [
+   "libxml2:docbook",
+   "True"
+  ],
+  [
+   "libxml2:fPIC",
+   "True"
+  ],
+  [
+   "libxml2:ftp",
+   "True"
+  ],
+  [
+   "libxml2:html",
+   "True"
+  ],
+  [
+   "libxml2:http",
+   "True"
+  ],
+  [
+   "libxml2:iconv",
+   "True"
+  ],
+  [
+   "libxml2:icu",
+   "False"
+  ],
+  [
+   "libxml2:include_utils",
+   "True"
+  ],
+  [
+   "libxml2:iso8859x",
+   "True"
+  ],
+  [
+   "libxml2:legacy",
+   "True"
+  ],
+  [
+   "libxml2:lzma",
+   "False"
+  ],
+  [
+   "libxml2:mem-debug",
+   "False"
+  ],
+  [
+   "libxml2:output",
+   "True"
+  ],
+  [
+   "libxml2:pattern",
+   "True"
+  ],
+  [
+   "libxml2:push",
+   "True"
+  ],
+  [
+   "libxml2:python",
+   "False"
+  ],
+  [
+   "libxml2:reader",
+   "True"
+  ],
+  [
+   "libxml2:regexps",
+   "True"
+  ],
+  [
+   "libxml2:run-debug",
+   "False"
+  ],
+  [
+   "libxml2:sax1",
+   "True"
+  ],
+  [
+   "libxml2:schemas",
+   "True"
+  ],
+  [
+   "libxml2:schematron",
+   "True"
+  ],
+  [
+   "libxml2:shared",
+   "False"
+  ],
+  [
+   "libxml2:threads",
+   "True"
+  ],
+  [
+   "libxml2:tree",
+   "True"
+  ],
+  [
+   "libxml2:valid",
+   "True"
+  ],
+  [
+   "libxml2:writer",
+   "True"
+  ],
+  [
+   "libxml2:xinclude",
+   "True"
+  ],
+  [
+   "libxml2:xpath",
+   "True"
+  ],
+  [
+   "libxml2:xptr",
+   "True"
+  ],
+  [
+   "libxml2:zlib",
+   "True"
   ],
   [
    "sfml:audio",
@@ -67,6 +239,42 @@
   [
    "sfml:window",
    "True"
+  ],
+  [
+   "vulkan-loader:shared",
+   "True"
+  ],
+  [
+   "vulkan-loader:with_wsi_directfb",
+   "False"
+  ],
+  [
+   "vulkan-loader:with_wsi_wayland",
+   "True"
+  ],
+  [
+   "vulkan-loader:with_wsi_xcb",
+   "True"
+  ],
+  [
+   "vulkan-loader:with_wsi_xlib",
+   "True"
+  ],
+  [
+   "wayland:enable_dtd_validation",
+   "True"
+  ],
+  [
+   "wayland:enable_libraries",
+   "True"
+  ],
+  [
+   "wayland:fPIC",
+   "True"
+  ],
+  [
+   "wayland:shared",
+   "False"
   ],
   [
    "zlib:fPIC",

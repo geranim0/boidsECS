@@ -6,5 +6,5 @@ if [ $? -ne 0 ]; then
 echo Compilation failed
 else
 echo Compilation success, running boidsECS
-boidsECS/build/Release/bin/boidsECS
+(cd boidsECS/build/Release/bin/ ; ./boidsECS)
 fi

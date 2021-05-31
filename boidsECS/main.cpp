@@ -1,4 +1,7 @@
 #include <SFML/Graphics.hpp>
+#include <GL/gl.h>
+#include <GL/glxext.h>
+
 #include <iostream>
 
 #include <boidsECS/ECS.hpp>
@@ -237,6 +240,10 @@ int main()
         sf::CircleShape shape(100.f);
         shape.setFillColor(sf::Color::Green);
 
+        GLuint vbo;
+
+        glGenBuffers(1, &vbo);
+
         /*while (window.isOpen())
         {
             sf::Event event;
@@ -257,7 +264,7 @@ int main()
         }*/
 
         //flocon_generator::flocon_generator(window, BLOCKS_W, BLOCKS_H, BLOCK_PIXELS);
-        flocon_generator::flocon_generator_ECS(window, BLOCKS_W, BLOCKS_H, BLOCK_PIXELS);
+        flocon_generator::flocon_generator_ECS<(std::size_t)BLOCKS_W, (std::size_t)BLOCKS_H>(window, BLOCK_PIXELS);
     }
 
     return 0;

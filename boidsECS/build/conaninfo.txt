@@ -8,6 +8,8 @@
     os=Linux
 
 [requires]
+    glfw/3.Y.Z
+    opengl/system
     sfml/2.Y.Z
 
 [options]
@@ -26,11 +28,19 @@
 
 [full_requires]
     bzip2/1.0.8:7335ce7557cf2fc68688ae880c61a352969fba18
+    expat/2.2.10:d155072702f0e5b14a540f87c1a1eb75e5a87f53
     freetype/2.10.1:e130f6a9b09ab485b711b0bfad17b4a0982797cc
+    glfw/3.3.4:3c1a862a1465db61338e8286dcac25ab5c545b95
+    libffi/3.3:2b1e5ff9df96aaf5924c273e1368c632fcb32dd2
+    libiconv/1.16:2b1e5ff9df96aaf5924c273e1368c632fcb32dd2
     libpng/1.6.37:3ae3b4df51cacee433635ae8e8d85cb3673a03ac
+    libxml2/2.9.10:7e55ee9ca785482f82f0ce459f3a46395cbb636f
     opengl/system:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
     sfml/2.5.1@bincrafters/stable:2d56c929d8f4f1bb2add2588a9ed42036d86bd75
     stb/20200203:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    vulkan-headers/1.2.162.0:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    vulkan-loader/1.2.162.0:63b9f2115d3f9c65c249c431d8e6a784ef5efb63
+    wayland/1.18.0:883aa6184192e9105e23aebaf7f1b378da699bc1
     xorg/system:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
     zlib/1.2.11:2b1e5ff9df96aaf5924c273e1368c632fcb32dd2
 
@@ -38,20 +48,72 @@
     bzip2:build_executable=True
     bzip2:fPIC=True
     bzip2:shared=False
+    expat:char_type=char
+    expat:fPIC=True
+    expat:shared=False
     freetype:fPIC=True
     freetype:shared=False
     freetype:with_bzip2=True
     freetype:with_png=True
     freetype:with_zlib=True
+    glfw:fPIC=False
+    glfw:shared=False
+    glfw:vulkan_static=True
+    libffi:fPIC=True
+    libffi:shared=False
+    libiconv:fPIC=True
+    libiconv:shared=False
     libpng:api_prefix=None
     libpng:fPIC=True
     libpng:shared=False
+    libxml2:c14n=True
+    libxml2:catalog=True
+    libxml2:docbook=True
+    libxml2:fPIC=True
+    libxml2:ftp=True
+    libxml2:html=True
+    libxml2:http=True
+    libxml2:iconv=True
+    libxml2:icu=False
+    libxml2:include_utils=True
+    libxml2:iso8859x=True
+    libxml2:legacy=True
+    libxml2:lzma=False
+    libxml2:mem-debug=False
+    libxml2:output=True
+    libxml2:pattern=True
+    libxml2:push=True
+    libxml2:python=False
+    libxml2:reader=True
+    libxml2:regexps=True
+    libxml2:run-debug=False
+    libxml2:sax1=True
+    libxml2:schemas=True
+    libxml2:schematron=True
+    libxml2:shared=False
+    libxml2:threads=True
+    libxml2:tree=True
+    libxml2:valid=True
+    libxml2:writer=True
+    libxml2:xinclude=True
+    libxml2:xpath=True
+    libxml2:xptr=True
+    libxml2:zlib=True
     sfml:audio=False
     sfml:fPIC=True
     sfml:graphics=True
     sfml:network=False
     sfml:shared=False
     sfml:window=True
+    vulkan-loader:shared=True
+    vulkan-loader:with_wsi_directfb=False
+    vulkan-loader:with_wsi_wayland=True
+    vulkan-loader:with_wsi_xcb=True
+    vulkan-loader:with_wsi_xlib=True
+    wayland:enable_dtd_validation=True
+    wayland:enable_libraries=True
+    wayland:fPIC=True
+    wayland:shared=False
     zlib:fPIC=True
     zlib:minizip=deprecated
     zlib:shared=False
