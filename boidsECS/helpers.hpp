@@ -81,3 +81,8 @@ struct Counter
 
 	size_t counter;
 };
+
+struct AspectRatio
+{
+	uint x, y;
+};

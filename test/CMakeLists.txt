@@ -49,6 +49,7 @@ add_executable(
   gmeta.test.cpp
   bresenham.test.cpp
   flocon_generator.test.cpp
+  smash_game.test.cpp
 )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${CONAN_LIBS})

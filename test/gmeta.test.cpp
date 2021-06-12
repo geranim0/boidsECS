@@ -151,6 +151,11 @@ TEST(GMetaTests, remove_first_encountered_T_from_pack_t) {
   using expected5 = types_t<>;
   bool equal5 = gis_same_v<result5, expected5>;
   EXPECT_EQ(equal5, true);
+
+  using result6 = remove_first_encountered_T_from_pack_t<DeltaTime, types_t<int, float, char*, DeltaTime>>;
+  using expected6 = types_t<int, float, char*>;
+  bool equal6 = gis_same_v<result6, expected6>;
+  EXPECT_EQ(equal6, true);
 }
 
 TEST(GMetaTests, subset_of_t) {

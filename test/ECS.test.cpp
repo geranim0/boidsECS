@@ -1,6 +1,76 @@
 #include <gtest/gtest.h>
 #include <boidsECS/ECS.hpp>
 
+namespace test
+{
+  struct UpdatePositionSystem
+{
+  void pre_tick(){
+
+  }
+  void post_tick()
+  {
+
+  }
+
+	void operator()(position3f pos, DeltaTime const& dt) const
+	{
+		pos.x += 1 * double(dt);
+	}
+};
+
+struct UpdateSpeedSystem
+{
+    void pre_tick(){
+
+  }
+  void post_tick()
+  {
+    
+  }
+	void operator()(speed3f &speed) const
+	{
+		speed.y += 1;
+	}
+};
+
+struct UpdateCounterSystem
+{
+    void pre_tick(){
+
+  }
+  void post_tick()
+  {
+    
+  }
+	void operator()(Counter &counter) const
+	{
+		counter += 1;
+	}
+};
+
+  struct CapturingSystem
+  {
+    void pre_tick()
+    {
+
+    }
+    void post_tick()
+    {
+      
+    }
+    CapturingSystem(int& resource_to_capture_by_ref_) 
+    :resource_to_capture_by_ref{resource_to_capture_by_ref_}
+    {}
+
+    void operator()(Counter& counter)
+    {
+      counter += 1;
+      resource_to_capture_by_ref += 1;
+    }
+    int& resource_to_capture_by_ref;
+  };
+}
 
 TEST(ArchetypeChunk, Size)
 {
@@ -296,44 +366,12 @@ TEST(ECS, Constructor)
         Archetype<32, position3f, speed3f, Mass, Counter>,
         Archetype<2, int, double, Counter>>,
     gmeta::types_t<
-        UpdatePositionSystem,
-        UpdateSpeedSystem,
-        UpdateCounterSystem>>
+        test::UpdatePositionSystem,
+        test::UpdateSpeedSystem,
+        test::UpdateCounterSystem>>
     ecs;
 
     EXPECT_EQ(ecs.Size(), 0);
-}
-
-TEST(ECS, Capturing_Constructor_lambda)
-{
-  int resource_to_capture_by_ref = 0;
-
-  auto capturing_system = [&resource_to_capture_by_ref](Counter& counter)
-  {
-    counter += 1;
-    resource_to_capture_by_ref += 1;
-  };
-
-  ECS<gmeta::types_t<
-        Archetype<32, position3f, speed3f, Mass, Counter>,
-        Archetype<2, int, double, Counter>>, 
-      gmeta::types_t<
-        typeof(capturing_system)>>
-  ecs(std::move(capturing_system));
-
-  ecs.AddEntity<position3f, speed3f, Mass>(position3f{4, 2, 3}, speed3f{4, 5, 4}, Mass{5.4}, Counter{0});
-  ecs.AddEntity<position3f, speed3f, Mass>(position3f{5, 2, 3}, speed3f{4, 5, 5}, Mass{5.5}, Counter{0});
-
-  ecs.AddEntity(1, 1.1, Counter{0});
-  ecs.AddEntity(2, 2.2, Counter{0});
-
-  ecs.tick();
-
-  EXPECT_EQ(resource_to_capture_by_ref, 4);
-  ecs.foreach([](Counter const& counter)
-  {
-    EXPECT_EQ(counter, 1);
-  });
 }
 
 TEST(ECS, Capturing_Constructor_functor)
@@ -349,6 +387,9 @@ TEST(ECS, Capturing_Constructor_functor)
       counter += 1;
       captured += 1;
     }
+
+    void pre_tick(){}
+    void post_tick(){}
     int& captured;
   };
 
@@ -373,7 +414,7 @@ TEST(ECS, Capturing_Constructor_functor)
   ecs.foreach([](Counter const& counter)
   {
     EXPECT_EQ(counter, 1);
-  });
+  }, DeltaTime{0});
 }
 
 TEST(ECS, AddEntity)
@@ -382,9 +423,9 @@ TEST(ECS, AddEntity)
         Archetype<32, position3f, speed3f, Mass, Counter>,
         Archetype<2, int, double, Counter>>,
     gmeta::types_t<
-        UpdatePositionSystem,
-        UpdateSpeedSystem,
-        UpdateCounterSystem>>
+        test::UpdatePositionSystem,
+        test::UpdateSpeedSystem,
+        test::UpdateCounterSystem>>
     ecs;
 
     ecs.AddEntity(position3f{1, 2, 3}, speed3f{4, 5, 1}, Mass{5.1}, Counter{0});
@@ -405,9 +446,9 @@ TEST(ECS, DeleteEntity)
         Archetype<32, position3f, speed3f, Mass, Counter>,
         Archetype<2, int, double, Counter>>,
     gmeta::types_t<
-        UpdatePositionSystem,
-        UpdateSpeedSystem,
-        UpdateCounterSystem>>
+        test::UpdatePositionSystem,
+        test::UpdateSpeedSystem,
+        test::UpdateCounterSystem>>
     ecs;
 
     ecs.AddEntity(position3f{1, 2, 3}, speed3f{4, 5, 1}, Mass{5.1}, Counter{0});
@@ -432,9 +473,9 @@ TEST(ECS, foreach)
         Archetype<32, position3f, speed3f, Mass, Counter>,
         Archetype<2, int, double, Counter>>,
     gmeta::types_t<
-        UpdatePositionSystem,
-        UpdateSpeedSystem,
-        UpdateCounterSystem>>
+        test::UpdatePositionSystem,
+        test::UpdateSpeedSystem,
+        test::UpdateCounterSystem>>
     ecs;
 
     ecs.AddEntity(position3f{1, 2, 3}, speed3f{41, 0, 1}, Mass{5.1}, Counter{0});
@@ -444,8 +485,10 @@ TEST(ECS, foreach)
     ecs.AddEntity(1, 1.1, Counter{3});
     ecs.AddEntity(2, 2.2, Counter{4});
 
-    ecs.foreach([](Id id, position3f const pos, speed3f const& speed)
+    int foreach_counter = 0;
+    ecs.foreach([&foreach_counter](Id id, position3f const pos, speed3f const& speed)
     {
+      foreach_counter++;
       if (id == 0)
       {
         EXPECT_EQ(pos.x, 1);
@@ -461,33 +504,35 @@ TEST(ECS, foreach)
         EXPECT_EQ(pos.x, 3);
         EXPECT_EQ(speed.x, 43);
       }
-    });
+    }, DeltaTime{0});
+
+    EXPECT_EQ(foreach_counter, 3);
 
     ecs.foreach([](speed3f& speed)
     {
       speed.y += 1;
-    });
+    }, DeltaTime{0});
 
     ecs.foreach([](speed3f const speed, Id const& id)
     {
       if (id == 0)
       {
-        EXPECT_EQ(speed.y, 2);
+        EXPECT_EQ(speed.y, 1);
       }
       else if (id == 1)
       {
-        EXPECT_EQ(speed.y, 3);
+        EXPECT_EQ(speed.y, 2);
       }
       if (id == 2)
       {
-        EXPECT_EQ(speed.y, 4);
+        EXPECT_EQ(speed.y, 3);
       }
-    });
+    }, DeltaTime{0});
 
     ecs.foreach([](Id id, Counter counter)
     {
       EXPECT_EQ(counter, id);
-    });
+    }, DeltaTime{0});
 
     ecs.DeleteEntity(3);
     ecs.DeleteEntity(4);
@@ -496,7 +541,7 @@ TEST(ECS, foreach)
     ecs.foreach([&entities_with_int_counter](int x)
     {
       entities_with_int_counter += 1;
-    });
+    }, DeltaTime{0});
     EXPECT_EQ(entities_with_int_counter, 0);
 
 }
@@ -507,9 +552,9 @@ TEST(ECS, Compress)
         Archetype<1, position3f, speed3f, Mass, Counter>,
         Archetype<2, int, double, Counter>>,
     gmeta::types_t<
-        UpdatePositionSystem,
-        UpdateSpeedSystem,
-        UpdateCounterSystem>>
+        test::UpdatePositionSystem,
+        test::UpdateSpeedSystem,
+        test::UpdateCounterSystem>>
     ecs;
 
     ecs.AddEntity(position3f{1, 2, 3}, speed3f{4, 5, 1}, Mass{5.1}, Counter{0});

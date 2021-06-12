@@ -9,11 +9,11 @@
 #include <type_traits>
 #include <limits>
 #include <cstring>
+#include <chrono>
 
+#include <boidsECS/usings.hpp>
 #include <boidsECS/gmeta.hpp>
 #include <boidsECS/helpers.hpp>
-
-using Id = std::size_t;
 
 template <std::size_t ChunkSize, typename... Ts>
 class ArchetypeChunk
@@ -37,9 +37,17 @@ public:
 	}
 
 	template <typename Fn>
+	void foreach (Fn &&fn, DeltaTime dt)
+	{
+		using FnTsWithoutDeltaTime = gmeta::remove_first_encountered_T_from_pack_t<DeltaTime ,typename gmeta::fntraits_t<Fn>::Args_t>;
+		foreach_inner<Fn, ChunkSize, std::tuple<std::array<Id, ChunkSize>, std::array<std::remove_cvref_t<Ts>, ChunkSize>...>, FnTsWithoutDeltaTime>{}(std::forward<Fn>(fn), _arrays, _size, dt);
+	}
+
+	template <typename Fn>
 	void foreach (Fn &&fn)
 	{
-		foreach_inner<Fn, ChunkSize, std::tuple<std::array<Id, ChunkSize>, std::array<std::remove_cvref_t<Ts>, ChunkSize>...>, typename gmeta::fntraits_t<Fn>::Args_t>{}(std::forward<Fn>(fn), _arrays, _size);
+		using FnTsWithoutDeltaTime = gmeta::remove_first_encountered_T_from_pack_t<DeltaTime ,typename gmeta::fntraits_t<Fn>::Args_t>;
+		foreach_inner<Fn, ChunkSize, std::tuple<std::array<Id, ChunkSize>, std::array<std::remove_cvref_t<Ts>, ChunkSize>...>, FnTsWithoutDeltaTime>{}(std::forward<Fn>(fn), _arrays, _size);
 	}
 
 	bool AddEntity(Id id, Ts... args)
@@ -109,10 +117,18 @@ private:
 	template <typename Fn, std::size_t _ChunkSize, typename ArraysT, typename... _Ts>
 	struct foreach_inner<Fn, _ChunkSize, ArraysT, gmeta::types_t<_Ts...>>
 	{
+		void operator()(Fn &&fn, ArraysT &arrays, std::size_t size, DeltaTime dt)
+		{
+			for (std::size_t i = 0; i < size; i++)
+			{	
+				fn(std::get<std::array<std::remove_cvref_t<_Ts>, _ChunkSize>>(arrays)[i]..., dt);
+			}
+		}
+		
 		void operator()(Fn &&fn, ArraysT &arrays, std::size_t size)
 		{
 			for (std::size_t i = 0; i < size; i++)
-			{
+			{	
 				fn(std::get<std::array<std::remove_cvref_t<_Ts>, _ChunkSize>>(arrays)[i]...);
 			}
 		}
@@ -306,6 +322,15 @@ public:
 	}
 
 	template <typename Fn>
+	void foreach (Fn &&fn, DeltaTime dt)
+	{
+		for (auto &chunk : _chunks)
+		{
+			chunk.foreach (std::forward<Fn>(fn), dt);
+		}
+	}
+
+	template <typename Fn>
 	void foreach (Fn &&fn)
 	{
 		for (auto &chunk : _chunks)
@@ -341,30 +366,6 @@ private:
 	size_t _size;
 };
 
-struct UpdatePositionSystem
-{
-	void operator()(position3f pos) const
-	{
-		pos.x += 1;
-	}
-};
-
-struct UpdateSpeedSystem
-{
-	void operator()(speed3f &speed) const
-	{
-		speed.y += 1;
-	}
-};
-
-struct UpdateCounterSystem
-{
-	void operator()(Counter &counter) const
-	{
-		counter += 1;
-	}
-};
-
 //when instanciating ECS object, must specify all archetype types that are going to be used with ECS
 //and also all systems
 template <typename ArchetypeTs, typename SystemTs, typename Enable = void>
@@ -382,12 +383,14 @@ public:
 	{
 		nextId = 0;
 		size = 0;
+		time_previous_frame = std::chrono::high_resolution_clock::now();
 	}
 
 	ECS(SystemTs&&... systems_) : systems{std::tuple<SystemTs...>{systems_...}}
 	{
 		nextId = 0;
 		size = 0;
+		time_previous_frame = std::chrono::high_resolution_clock::now();
 	}
 
 	template <typename... Ts>
@@ -453,16 +456,24 @@ public:
 	}
 
 	template <typename Fn>
-	void foreach (Fn &&fn)
+	void foreach (Fn &&fn, DeltaTime dt)
 	{
-		foreach_inner<Fn, std::tuple<ArchetypeTs...>, gmeta::get_archs_from_system_t<gmeta::types_t<ArchetypeTs...>, Fn>>{}(std::forward<Fn>(fn), archetypes);
+		foreach_inner<Fn, std::tuple<ArchetypeTs...>, gmeta::get_archs_from_system_t<gmeta::types_t<ArchetypeTs...>, Fn>>{}(std::forward<Fn>(fn), archetypes, dt);
 	}
 
 	void tick()
 	{
+		time_now = std::chrono::high_resolution_clock::now();
+		auto dt = time_now - time_previous_frame;
+		DeltaTime dt_seconds{static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(dt).count()) / 1000000.0};
+		time_previous_frame = time_now;
+
+
 		foreach_tuple(
 			[&](auto &system) {
-				foreach (system);
+				system.pre_tick();
+				foreach (system, dt_seconds);
+				system.post_tick();
 			},
 			systems);
 	}
@@ -476,9 +487,16 @@ private:
 	template <typename Fn, typename ArchetypesT, typename... MatchingArchetypes>
 	struct foreach_inner<Fn, ArchetypesT, gmeta::types_t<MatchingArchetypes...>>
 	{
-		void operator()(Fn &&fn, ArchetypesT &archetypes)
+		void operator()(Fn &&fn, ArchetypesT &archetypes, DeltaTime dt)
 		{
-			(std::get<MatchingArchetypes>(archetypes).foreach (std::forward<Fn>(fn)), ...);
+			if constexpr (gmeta::types_t_pack_contains_v<DeltaTime, typename gmeta::fntraits_t<Fn>::Args_t>)
+			{
+				(std::get<MatchingArchetypes>(archetypes).foreach (std::forward<Fn>(fn), dt), ...);
+			}
+			else
+			{
+				(std::get<MatchingArchetypes>(archetypes).foreach (std::forward<Fn>(fn)), ...);
+			}
 		}
 	};
 
@@ -487,4 +505,8 @@ private:
 	std::unordered_map<std::size_t, std::variant<ArchetypeTs *...>> id_to_archetype_map;
 	std::tuple<SystemTs...> systems;
 	std::size_t size;
+
+	//time
+	std::chrono::_V2::system_clock::time_point time_now;
+	std::chrono::_V2::system_clock::time_point time_previous_frame;
 };

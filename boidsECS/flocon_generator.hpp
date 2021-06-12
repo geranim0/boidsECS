@@ -5,6 +5,7 @@
 #include <random>
 #include <set>
 #include <SFML/Graphics.hpp>
+#include <GL/glew.h>
 #include <boidsECS/bresenham.hpp>
 #include <boidsECS/helpers.hpp>
 #include <boidsECS/ECS.hpp>
@@ -253,6 +254,16 @@ namespace flocon_generator
         PositionUpdateSystem(config const& cfg_) : cfg{cfg_}
         {}
 
+        void pre_tick()
+        {
+
+        }
+        
+        void post_tick()
+        {
+            
+        }
+
         void operator()(position2i& pos, speed2i& speed)
         {
             pos = {pos.x + speed.x, pos.y + speed.y};
@@ -385,6 +396,16 @@ namespace flocon_generator
             }
         }
 
+        void pre_tick()
+        {
+
+        }
+        
+        void post_tick()
+        {
+            
+        }
+
         void operator()(position2i& pos, speed2i& speed)
         {
             //opti: maybe use a generator here with coroutines
@@ -430,6 +451,16 @@ namespace flocon_generator
             block{{(float)cfg_.block_size, (float)cfg_.block_size}}
         {}
 
+        void pre_tick()
+        {
+
+        }
+        
+        void post_tick()
+        {
+
+        }
+
         void operator()()
         {
             window.clear();
@@ -452,14 +483,21 @@ namespace flocon_generator
         sf::RenderWindow& window;
     };
 
-    template<std::size_t blocks_w, std::size_t blocks_h>
-    void flocon_generator_ECS(sf::RenderWindow& window, int block_size)
+    void flocon_generator_ECS()
     {
         using std::set;
         using std::size_t;
         using std::array;
         using std::mt19937_64;
 
+        constexpr int BLOCKS_W = 1001;
+        constexpr int BLOCKS_H = 1001;
+        constexpr int BLOCK_PIXELS = 1;
+        int block_size = BLOCK_PIXELS;
+        constexpr std::size_t blocks_w = BLOCKS_W;
+        constexpr std::size_t blocks_h = BLOCKS_H;
+
+        sf::RenderWindow window(sf::VideoMode(BLOCKS_W* BLOCK_PIXELS, BLOCKS_H* BLOCK_PIXELS), "boidsECS", sf::Style::Titlebar | sf::Style::Close);
 
         //set<position2i> structure;
         gstructure<blocks_w, blocks_h> structure;
@@ -517,9 +555,22 @@ namespace flocon_generator
                 std::cout << "Could not load fragment shader" << std::endl;
                 abort();  
             }
-            fragment_shader.setUniform("w", (int)blocks_w);
-            fragment_shader.setUniform("h", (int)blocks_h);
+
             fragment_shader.setUniform("num_ints_w", (int)(2*structure.num_sizet_w));
+
+            std::array<uint64_t, flocon_generator::gstructure<blocks_w, blocks_h>::array_size> test_array;
+            for (uint64_t& x : test_array)
+            {
+                x = ~0;
+            }
+
+            GLuint ssbo;
+            glewInit(); //required for glGenBuffers otherwise we get segfault
+            glGenBuffers(1, &ssbo);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+            glBufferData(GL_SHADER_STORAGE_BUFFER, flocon_generator::gstructure<blocks_w, blocks_h>::array_size*8, nullptr, GL_DYNAMIC_DRAW);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
             using Clock = std::chrono::high_resolution_clock;
             auto time_start = Clock::now();
@@ -537,32 +588,17 @@ namespace flocon_generator
                 ecs.tick();
 
                 window.clear();
-                //old structure
-                /*for(auto const& pos : structure)
-                {
-                    block.setPosition({(float) pos.x*cfg.block_size, (float) (cfg.blocks_h - pos.y)*cfg.block_size});
-                    window.draw(block);
-                }*/
 
-                /*for (uint64_t j = 0; j < blocks_h; j++)
-                {
-                    for (uint64_t i = 0; i < structure.num_sizet_w; i++)
-                    {
-                        for (uint64_t k = 0; k < 64; k++)
-                        {
-                            if ((structure.image[structure.num_sizet_w *j + i] & ((uint64_t)1 << (63 - k))) != 0)
-                            {
-                                block.setPosition({(float) (64*i + k)*cfg.block_size, (float) (cfg.blocks_h - j)*cfg.block_size});
-                                window.draw(block);
-                            }
-                        }
-                    }
-                }*/
+                //update ssbo data
+                
+                glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+                glBufferData(GL_SHADER_STORAGE_BUFFER, flocon_generator::gstructure<blocks_w, blocks_h>::array_size*8, &structure.image, GL_DYNAMIC_DRAW);
 
-                fragment_shader.setUniformArray("pixel_data", (float*)(&structure.image) , 2*structure.array_size);
+                glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+                
 
-                //block.setSize({1000, 1000});
-                //window.draw(block, &fragment_shader);
+                block.setSize({blocks_w, blocks_h});
+                window.draw(block, &fragment_shader);
                 window.display();
                 
                 //FPS shit

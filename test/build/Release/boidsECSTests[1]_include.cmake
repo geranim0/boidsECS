@@ -1,0 +1,5 @@
+if(EXISTS "/home/sam/development/boidsECS/test/build/Release/boidsECSTests[1]_tests.cmake")
+  include("/home/sam/development/boidsECS/test/build/Release/boidsECSTests[1]_tests.cmake")
+else()
+  add_test(boidsECSTests_NOT_BUILT boidsECSTests_NOT_BUILT)
+endif()

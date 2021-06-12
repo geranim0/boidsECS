@@ -54,6 +54,12 @@
         "unordered_set": "cpp",
         "chrono": "cpp",
         "ctime": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "map": "cpp",
+        "ranges": "cpp",
+        "cinttypes": "cpp",
+        "iomanip": "cpp"
     }
 }

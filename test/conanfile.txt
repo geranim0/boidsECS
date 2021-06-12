@@ -1,6 +1,8 @@
 [requires]
 sfml/2.5.1@bincrafters/stable
 gtest/1.10.0
+glew/2.2.0
+opengl/system
 
 
 [options]
@@ -10,6 +12,10 @@ sfml:audio=False
 sfml:network=False
 gtest:build_gmock=False
 gtest:shared=True
+
+glew:shared=False
+glew:fPIC=True
+glew:with_egl=False
 
 
 [generators]

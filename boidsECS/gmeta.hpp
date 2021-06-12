@@ -3,6 +3,7 @@
 #include <variant>
 #include <array>
 #include <iostream>
+#include <boidsECS/usings.hpp>
 
 namespace gmeta
 {
@@ -138,7 +139,7 @@ namespace gmeta
 	using gis_same_t = typename gis_same<T, U>::type;
 
 	template<typename T, typename U>
-	bool gis_same_v = gis_same<T, U>::value;
+	constexpr bool gis_same_v = gis_same<T, U>::value;
 
 	template<typename cond, typename True, typename False>
 	struct gcond {};
@@ -191,7 +192,24 @@ namespace gmeta
 	using pack_contains_t = typename pack_contains<T, Ts...>::type;
 
 	template<typename T, typename... Ts>
-	bool pack_contains_v = gis_same_v<true_t, pack_contains_t<T, Ts...>>;
+	constexpr bool pack_contains_v = gis_same_v<true_t, pack_contains_t<T, Ts...>>;
+
+	template<typename T, typename Ts>
+	struct types_t_pack_contains
+	{};
+
+	template<typename T, typename... Ts>
+	struct types_t_pack_contains<T, types_t<Ts...>>
+	{
+		using type = pack_contains_t<T, Ts...>;
+		static constexpr bool value = pack_contains_v<T, Ts...>;
+	};
+
+	template<typename T, typename Ts>
+	using types_t_pack_contains_t = typename types_t_pack_contains<T, Ts>::type;
+	
+	template<typename T, typename Ts>
+	constexpr bool types_t_pack_contains_v = types_t_pack_contains<T, Ts>::value;
 
 	template<typename Ts>
 	struct first_of_types_t_pack {};
@@ -204,6 +222,7 @@ namespace gmeta
 
 	template<typename Ts>
 	using first_of_types_t_pack_t = typename first_of_types_t_pack<Ts>::type;
+
 
 	template<typename First, typename Rest>
 	struct all_different_inner2
@@ -433,7 +452,7 @@ namespace gmeta
 	template<typename Ret, typename Class, typename... Args>
 	struct extract_parameter_types_from_system_call_operator_inner<fntraits_more<Ret, Class, Args...>>
 	{
-		using type = types_t<Args...>;
+		using type = types_t<std::remove_cvref_t<Args>...>;
 	};
 
 	template<typename System>
@@ -449,7 +468,8 @@ namespace gmeta
 	template<typename... Archetypes, typename System>
 	struct get_archs_from_system<types_t<Archetypes...>, System>
 	{
-		using type = get_archs_from_argument_types_t<types_t<Archetypes...>, extract_parameter_types_from_system_call_operator_inner_t<System>>;
+		using type = get_archs_from_argument_types_t<types_t<Archetypes...>, 
+			remove_first_encountered_T_from_pack_t<DeltaTime, extract_parameter_types_from_system_call_operator_inner_t<System>>>;
 	};
 
 	template<typename Archetypes, typename System>

@@ -1,6 +1,6 @@
 [requires]
 sfml/2.5.1@bincrafters/stable
-glfw/3.3.4
+glew/2.2.0
 opengl/system
 
 [options]
@@ -8,9 +8,10 @@ sfml:graphics=True
 sfml:window=True
 sfml:audio=False
 sfml:network=False
-glfw:shared=False
-glfw:fPIC=False
-glfw:vulkan_static=True
+
+glew:shared=False
+glew:fPIC=True
+glew:with_egl=False
 
 [generators]
 cmake
